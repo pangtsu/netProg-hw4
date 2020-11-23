@@ -9,7 +9,7 @@ import select
 
 
 def run_client():
-    if len(sys.argv) != 8:
+    if len(sys.argv) != 7:
         print(f"Proper usage is {sys.argv[0]} [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]")
         sys.exit(0)
 
