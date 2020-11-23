@@ -4,15 +4,19 @@ import sys  # For arg parsing
 import socket  # For sockets
 import select
 
+# python3 client.py [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]
+# i.e.,: python3 client.py control 9000 client1 10 5 5
+
+
 def run_client():
-    #if len(sys.argv) != 3:
-        #print(f"Proper usage is {sys.argv[0]} [server name/address] [server port]")
-        #sys.exit(0)
+    if len(sys.argv) != 8:
+        print(f"Proper usage is {sys.argv[0]} [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]")
+        sys.exit(0)
 
     # Create the TCP socket, connect to the server
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # bind takes a 2-tuple, not 2 arguments
-    server_socket.connect(('localhost', int(sys.argv[1])))
+    server_socket.connect(('localhost', int(sys.argv[2])))
     inputs = [sys.stdin, server_socket]
     outputs = []
 

@@ -5,11 +5,12 @@ import socket  # For sockets
 import select
 
 
-
+# python3 server.py [control port] [base station file]
+# i.e.,: python3 server.py 9000 base_stations.txt
 
 def run_server():
     if len(sys.argv) != 3:
-        print(f"Proper usage is {sys.argv[0]} [port number]")
+        print(f"Proper usage is {sys.argv[0]} [control port] [base station file]")
         sys.exit(0)
 
     base_stations = {}
