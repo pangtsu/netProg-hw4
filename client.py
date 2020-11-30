@@ -10,7 +10,7 @@ import select
 
 def run_client():
     if len(sys.argv) != 7:
-        print(f"Proper usage is {sys.argv[0]} [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]")
+        printf("Proper usage is {sys.argv[0]} [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]")
         sys.exit(0)
 
     # Create the TCP socket, connect to the server
@@ -53,8 +53,8 @@ def run_client():
     server_socket.close()
 
     # Print the response to standard output, both as byte stream and decoded text
-    print(f"Received {recv_string} from the server")
-    print(f"Decoding, received {recv_string.decode('utf-8')} from the server")
+    printf("Received {recv_string} from the server")
+    printf("Decoding, received {recv_string.decode('utf-8')} from the server")
 
 if __name__ == '__main__':
     run_client()

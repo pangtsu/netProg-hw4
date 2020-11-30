@@ -10,7 +10,7 @@ import select
 
 def run_server():
     if len(sys.argv) != 3:
-        print(f"Proper usage is {sys.argv[0]} [control port] [base station file]")
+        printf("Proper usage is {sys.argv[0]} [control port] [base station file]")
         sys.exit(0)
 
     base_stations = {}
@@ -73,7 +73,7 @@ def run_server():
 
                     elif (command[0] == 'DATAMESSAGE'):
                         print("DATAMESSAGE")
-                        print(f"Server received {len(message)} bytes: \"{message}\"")
+                        printf("Server received {len(message)} bytes: \"{message}\"")
                     #client_socket.send(message)
                 else:
                     print("Client has closed")
