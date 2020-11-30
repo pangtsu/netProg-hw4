@@ -66,7 +66,10 @@ def run_server():
                 if message:
                     command = message.split()
                     if (command[0] == 'WHERE'):
-                        print("WHERE")
+                        print("WHERE:")
+                        print(command)
+
+                        # This is where you call the THERE function. I think
 
                     elif (command[0] == 'UPDATEPOSITION'):
                         print("UPDATEPOSITION")
