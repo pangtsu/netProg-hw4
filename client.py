@@ -6,14 +6,15 @@ import select
 
 # python3 client.py [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]
 # i.e.,: python3 client.py control 9000 client1 10 5 5
-# [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]
 
 
 
+def sendWhere(server_socket, inputs, outputs, IDToSearch):
+    # package where message
+    send_string = "WHERE " + str(IDToSearch)
 
-
-
-
+    # send WHERE message
+    server_socket.sendall(send_string.encode('utf-8'))
 
 
 
@@ -44,6 +45,7 @@ def run_client():
                 line = sys.stdin.readline()
                 command = line.split()
                 if (command[0] == 'MOVE'):
+                    print("MOVE")
                     xPos =int(command[1])
                     yPos = int(command[2])
                     # senddata [SensorID] [SensorRange] [CurrentXPosition] [CurrentYPosition]
@@ -59,12 +61,6 @@ def run_client():
                         data = server_socket.recv(4096)
                         if data.startswith("REACHABLE"):
                             break;
-
-
-
-
-
-
                 if (command[0] == 'SENDDATA'):
                     print("SENDDATA")
                     send_string = "WHERE"
