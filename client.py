@@ -8,58 +8,14 @@ import select
 # i.e.,: python3 client.py control 9000 client1 10 5 5
 
 
-""" 
-Sensors can send a WHERE message to the control server:
-WHERE [SensorID/BaseID] to get the location of a particular base station or sensor ID from the control server. It should not take any other actions until it gets a THERE message back from the server.
 
-NOTE: THIS IS A RUDIMENTARY ATTEMPT. CAN BE EDITED TO BE IMPROVED (maybe not)
-Things I've done:
-  1. Send a string with a (hardcoded) id
-
-Things I haven't tested:
-  1. Receiving a message
-  2. Printing the received message
-  3. Waiting for the message and then breaking loop
-
-Things I haven't done:
-  1. Using standard input to access the id
-  2. Return the message
-"""
-def sendWhere(server_socket, inputs, outputs, id):
+def sendWhere(server_socket, inputs, outputs, IDToSearch):
     # package where message
-    send_string = "WHERE Just a random message " + str(id)
+    send_string = "WHERE " + str(IDToSearch)
     
     # send WHERE message
     server_socket.sendall(send_string.encode('utf-8'))
-    
-    # wait for reply
-    print("Just waiting for a message~")
 
-    # receive THERE message
-    while True:
-        print("at the beginning of loop")
-        readable, writeable, exception = select.select(inputs, outputs, inputs)
-        for s in readable:
-            if s is sys.stdin:
-                print("Hello!")
-                #do nothing. Just copying Joann's code for now. Shouldn't be anything...
-            else:
-                message = s.recv(1024).decode("utf-8")
-                if message:
-                    stuff = message.split()
-                    if (stuff[0] == "THERE"):
-                        print("Message:")
-                        print(stuff)
-                        break
-                    else:
-                        print("Received non-there message:")
-                        print(stuff)
-                        break
-                else:
-                    print("Error in WHERE")
-                    break
-    
-    return None
 
 
 
@@ -97,8 +53,8 @@ def run_client():
                     
                 # ~~~~~~~ CJ's testing Code
                 elif (command[0] == 'WHERE'):
-                    print("This is a where~ ID is set to 10 for now~")
-                    sendWhere(server_socket, inputs, outputs, 10)
+                    IDToSearch = command[1]
+                    sendWhere(server_socket, inputs, outputs, IDToSearch)
                     
                 # ~~~~~~~ end CJ's testing code
  
@@ -111,6 +67,9 @@ def run_client():
                     if (command[0] == 'DATAMESSAGE'):
                         print("WHERE")
                     #client_socket.send(message)
+
+                    elif (command[0] == 'THERE'):
+                        print(command)
                 else:
                     print("Server has closed")
                     #client_socket.close()

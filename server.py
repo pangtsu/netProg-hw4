@@ -8,9 +8,9 @@ import select
 # python3 server.py [control port] [base station file]
 # i.e.,: python3 server.py 9000 base_stations.txt
 
-def handleWHERE(client_socket, IDToSearch, ):
-    finalString = "THERE " + IDToSearch + " " + sensorLocations[IDToSearch]["x"] + " " + sensorLocations[IDToSearch]["y"]
-    client_socket.sendAll(finalString)
+def sendTHERE(client_socket, IDToSearch, clients):
+    finalString = "THERE " + IDToSearch + " " + clients[IDToSearch]["x"] + " " + clients[IDToSearch]["y"]
+    client_socket.sendall(finalString.encode('utf-8'))
 
 def run_server():
     if len(sys.argv) != 3:
@@ -72,8 +72,7 @@ def run_server():
                     command = message.split()
                     if (command[0] == 'WHERE'):
                         print("WHERE:")
-                        print(command)
-
+                        sendTHERE(s, command[1], clients)
                         # This is where you call the THERE function. I think
 
                     elif (command[0] == 'UPDATEPOSITION'):
@@ -88,10 +87,6 @@ def run_server():
                         print("DATAMESSAGE")
                         printf("Server received {len(message)} bytes: \"{message}\"")
 
-                    elif (command[0]) == 'WHERE':
-                        print('WHERE')
-                        handleWHERE(s, command[1])
-                    #client_socket.send(message)
                 else:
                     print("Client has closed")
                     #client_socket.close()
