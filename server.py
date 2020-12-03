@@ -8,11 +8,16 @@ import select
 # python3 server.py [control port] [base station file]
 # i.e.,: python3 server.py 9000 base_stations.txt
 
+def handleWHERE(client_socket, IDToSearch, ):
+    finalString = "THERE " + IDToSearch + " " + sensorLocations[IDToSearch]["x"] + " " + sensorLocations[IDToSearch]["y"]
+    client_socket.sendAll(finalString)
+
 def run_server():
     if len(sys.argv) != 3:
         printf("Proper usage is {sys.argv[0]} [control port] [base station file]")
         sys.exit(0)
 
+    sensorLocations = {}
     base_stations = {}
     # Reads the base station file and parse each line
     filepath = sys.argv[2]
@@ -77,6 +82,10 @@ def run_server():
                     elif (command[0] == 'DATAMESSAGE'):
                         print("DATAMESSAGE")
                         printf("Server received {len(message)} bytes: \"{message}\"")
+
+                    elif (command[0]) == 'WHERE':
+                        print('WHERE')
+                        handleWHERE(s, command[1])
                     #client_socket.send(message)
                 else:
                     print("Client has closed")
