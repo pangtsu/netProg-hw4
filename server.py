@@ -8,11 +8,16 @@ import select
 # python3 server.py [control port] [base station file]
 # i.e.,: python3 server.py 9000 base_stations.txt
 
+def sendTHERE(client_socket, IDToSearch, clients):
+    finalString = "THERE " + IDToSearch + " " + str(clients[IDToSearch]["x"]) + " " + str(clients[IDToSearch]["y"])
+    client_socket.sendall(finalString.encode('utf-8'))
+
 def run_server():
     if len(sys.argv) != 3:
-        print(f"Proper usage is {sys.argv[0]} [control port] [base station file]")
+        printf("Proper usage is {sys.argv[0]} [control port] [base station file]")
         sys.exit(0)
 
+    sensorLocations = {}
     base_stations = {}
     clients = {}
     # Reads the base station file and parse each line
@@ -66,7 +71,9 @@ def run_server():
                 if message:
                     command = message.split()
                     if (command[0] == 'WHERE'):
-                        print("WHERE")
+                        print("WHERE:")
+                        sendTHERE(s, command[1], clients)
+                        # This is where you call the THERE function. I think
 
                     elif (command[0] == 'UPDATEPOSITION'):
                         print(message)
@@ -78,8 +85,8 @@ def run_server():
                         print(clients)
                     elif (command[0] == 'DATAMESSAGE'):
                         print("DATAMESSAGE")
-                        print(f"Server received {len(message)} bytes: \"{message}\"")
-                    #client_socket.send(message)
+                        printf("Server received {len(message)} bytes: \"{message}\"")
+
                 else:
                     print("Client has closed")
                     #client_socket.close()

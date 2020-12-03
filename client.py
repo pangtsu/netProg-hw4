@@ -8,9 +8,20 @@ import select
 # i.e.,: python3 client.py control 9000 client1 10 5 5
 
 
+
+def sendWhere(server_socket, inputs, outputs, IDToSearch):
+    # package where message
+    send_string = "WHERE " + str(IDToSearch)
+    
+    # send WHERE message
+    server_socket.sendall(send_string.encode('utf-8'))
+
+
+
+
 def run_client():
     if len(sys.argv) != 7:
-        print(f"Proper usage is {sys.argv[0]} [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]")
+        printf("Proper usage is {sys.argv[0]} [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]")
         sys.exit(0)
     ID = sys.argv[3]
     r = int(sys.argv[4])
@@ -39,7 +50,14 @@ def run_client():
                     print("SENDDATA")
                     send_string = "WHERE"
                     server_socket.sendall(send_string.encode('utf-8'))
-
+                    
+                # ~~~~~~~ CJ's testing Code
+                elif (command[0] == 'WHERE'):
+                    IDToSearch = command[1]
+                    sendWhere(server_socket, inputs, outputs, IDToSearch)
+                    
+                # ~~~~~~~ end CJ's testing code
+ 
                 elif (command[0] == 'QUIT'):
                     print("QUIT")
             else:
@@ -49,18 +67,22 @@ def run_client():
                     if (command[0] == 'DATAMESSAGE'):
                         print("WHERE")
                     #client_socket.send(message)
+
+                    elif (command[0] == 'THERE'):
+                        print("Receive THERE")
+                        print(command)
                 else:
                     print("Server has closed")
                     #client_socket.close()
-                    break    
+                    break
 
     # Disconnect from the server
     print("Closing connection to server")
     server_socket.close()
 
     # Print the response to standard output, both as byte stream and decoded text
-    print(f"Received {recv_string} from the server")
-    print(f"Decoding, received {recv_string.decode('utf-8')} from the server")
+    print("Received {recv_string} from the server")
+    print("Decoding, received {recv_string.decode('utf-8')} from the server")
 
 if __name__ == '__main__':
     run_client()
