@@ -21,7 +21,7 @@ def sendWhere(server_socket, inputs, outputs, IDToSearch):
 
 def run_client():
     if len(sys.argv) != 7:
-        printf("Proper usage is {sys.argv[0]} [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]")
+        print(f"Proper usage is {sys.argv[0]} [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]")
         sys.exit(0)
     ID = sys.argv[3]
     r = int(sys.argv[4])
