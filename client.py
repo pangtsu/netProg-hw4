@@ -69,6 +69,7 @@ def run_client():
                     #client_socket.send(message)
 
                     elif (command[0] == 'THERE'):
+                        print("Receive THERE")
                         print(command)
                 else:
                     print("Server has closed")

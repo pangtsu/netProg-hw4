@@ -9,7 +9,7 @@ import select
 # i.e.,: python3 server.py 9000 base_stations.txt
 
 def sendTHERE(client_socket, IDToSearch, clients):
-    finalString = "THERE " + IDToSearch + " " + clients[IDToSearch]["x"] + " " + clients[IDToSearch]["y"]
+    finalString = "THERE " + IDToSearch + " " + str(clients[IDToSearch]["x"]) + " " + str(clients[IDToSearch]["y"])
     client_socket.sendall(finalString.encode('utf-8'))
 
 def run_server():
