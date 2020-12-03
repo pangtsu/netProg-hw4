@@ -7,27 +7,7 @@ import select
 # python3 client.py [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]
 # i.e.,: python3 client.py control 9000 client1 10 5 5
 # [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]
-class sensor:
-    def __init__(self,ctrl_address,ctrl_port,sensor_id,sensor_range,x,y):
-        self.ctrl_address = ctrl_address
-        self.ctrl_port = ctrl_port
-        self.sensor_id = sensor_id
-        self.sensor_range = sensor_range
-        self.x = x
-        self.y = y
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        def move(new_x,new_y):
-            self.x = new_x
-            self.y = new_y
-            # senddata [SensorID] [SensorRange] [CurrentXPosition] [CurrentYPosition]
-            self.senddata("UPDATEPOSITION",[self.sensor_id,self.sensor_range,self.x,self.y])
-
-        def senddata(message,parameters):
-            sendmessage = message
-            for p in parameters:
-                sendmessage += str(p)
-            self.socket.send(sendmessage)
 
 
 
@@ -79,7 +59,7 @@ def run_client():
                         data = server_socket.recv(4096)
                         if data.startswith("REACHABLE"):
                             break;
-                            
+
 
 
 
