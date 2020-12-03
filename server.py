@@ -19,6 +19,7 @@ def run_server():
 
     sensorLocations = {}
     base_stations = {}
+    clients = {}
     # Reads the base station file and parse each line
     filepath = sys.argv[2]
     with open(filepath) as fp:
@@ -45,7 +46,6 @@ def run_server():
     outputs = []
 
     while True:
-        print("at the beginning of loop")
         readable, writeable, exception = select.select(inputs, outputs, inputs)
         for s in readable:
             if s is sys.stdin:
@@ -77,8 +77,13 @@ def run_server():
                         # This is where you call the THERE function. I think
 
                     elif (command[0] == 'UPDATEPOSITION'):
-                        print("UPDATEPOSITION")
-
+                        print(message)
+                        args = message.split()
+                        clients[args[1]] = {}
+                        clients[args[1]]["r"] = int(args[2])
+                        clients[args[1]]["x"] = int(args[3])
+                        clients[args[1]]["y"] = int(args[4])
+                        print(clients)
                     elif (command[0] == 'DATAMESSAGE'):
                         print("DATAMESSAGE")
                         printf("Server received {len(message)} bytes: \"{message}\"")

@@ -67,16 +67,22 @@ def run_client():
     if len(sys.argv) != 7:
         printf("Proper usage is {sys.argv[0]} [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]")
         sys.exit(0)
-
+    ID = sys.argv[3]
+    r = int(sys.argv[4])
+    xPos = int(sys.argv[5])
+    yPos = int(sys.argv[6])
     # Create the TCP socket, connect to the server
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # bind takes a 2-tuple, not 2 arguments
     server_socket.connect(('localhost', int(sys.argv[2])))
+
+    # sends a UPDATEPOSITION to server once sensor starts up
+    tmp = "UPDATEPOSITION " + ID + " " + str(r) + " " + str(xPos) + " " + str(yPos)
+    server_socket.sendall(tmp.encode('utf-8'))
     inputs = [sys.stdin, server_socket]
     outputs = []
 
     while True:
-        print("at the beginning of loop")
         readable, writeable, exception = select.select(inputs, outputs, inputs)
         for s in readable:
             if s is sys.stdin:
@@ -106,7 +112,7 @@ def run_client():
                         print("WHERE")
                     #client_socket.send(message)
                 else:
-                    print("Client has closed")
+                    print("Server has closed")
                     #client_socket.close()
                     break
 
