@@ -6,18 +6,48 @@ import select
 
 # python3 client.py [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]
 # i.e.,: python3 client.py control 9000 client1 10 5 5
+# [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]
+class sensor:
+    def __init__(self,ctrl_address,ctrl_port,sensor_id,sensor_range,x,y):
+        self.ctrl_address = ctrl_address
+        self.ctrl_port = ctrl_port
+        self.sensor_id = sensor_id
+        self.sensor_range = sensor_range
+        self.x = x
+        self.y = y
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        def move(new_x,new_y):
+            self.x = new_x
+            self.y = new_y
+            # senddata [SensorID] [SensorRange] [CurrentXPosition] [CurrentYPosition]
+            self.senddata("UPDATEPOSITION",[self.sensor_id,self.sensor_range,self.x,self.y])
+
+        def senddata(message,parameters):
+            sendmessage = message
+            for p in parameters:
+                sendmessage += str(p)
+            self.socket.send(sendmessage)
+
+
+
+
+
+
+
 
 
 def run_client():
     if len(sys.argv) != 7:
         print(f"Proper usage is {sys.argv[0]} [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]")
         sys.exit(0)
+    cur_sensor = sensor(sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6])
 
     # Create the TCP socket, connect to the server
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
     # bind takes a 2-tuple, not 2 arguments
-    server_socket.connect(('localhost', int(sys.argv[2])))
-    inputs = [sys.stdin, server_socket]
+    self.socket.connect(('localhost', int(sys.argv[2])))
+    inputs = [sys.stdin, self.socket]
     outputs = []
 
     while True:
@@ -28,11 +58,14 @@ def run_client():
                 line = sys.stdin.readline()
                 command = line.split()
                 if (command[0] == 'MOVE'):
+                    NewXPosition = command[1]
+                    NewYPosition =  command[2]
+
                     print("MOVE")
                 if (command[0] == 'SENDDATA'):
                     print("SENDDATA")
                     send_string = "WHERE"
-                    server_socket.sendall(send_string.encode('utf-8'))
+                    self.socket.sendall(send_string.encode('utf-8'))
 
                 elif (command[0] == 'QUIT'):
                     print("QUIT")
@@ -46,11 +79,11 @@ def run_client():
                 else:
                     print("Client has closed")
                     #client_socket.close()
-                    break    
+                    break
 
     # Disconnect from the server
     print("Closing connection to server")
-    server_socket.close()
+    self.socket.close()
 
     # Print the response to standard output, both as byte stream and decoded text
     print(f"Received {recv_string} from the server")
