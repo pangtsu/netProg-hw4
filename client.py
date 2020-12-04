@@ -3,7 +3,7 @@
 import sys  # For arg parsing
 import socket  # For sockets
 import select
-
+import json
 # python3 client.py [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]
 # i.e.,: python3 client.py control 9000 client1 10 5 5
 # [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]
@@ -24,8 +24,27 @@ def sendWhere(server_socket, inputs, outputs, IDToSearch):
         data = server_socket.recv(4096).decode("utf-8")
         command = data.split()
         if (command[0] == 'THERE'):
+            print("THERE is received")
             break
-        print("THERE is received")
+
+def updatePosition(server_socket, inputs, outputs, ID, r, xPos, yPos):
+     sendmessage = "UPDATEPOSITION"
+     sendmessage += " " + ID
+     sendmessage += " " + str(r)
+     sendmessage += " " + str(xPos)
+     sendmessage += " " + str(yPos)
+     server_socket.sendall(sendmessage.encode('utf-8'))
+
+     # they should receive a REACHABLE message
+     while True:
+        data = server_socket.recv(4096).decode("utf-8")
+        command = data.split()
+        if (command[0] == 'REACHABLE'):
+            numReachable = command[1]
+            string_data = data.split(" ", 2)[2]
+            reachable = json.loads(string_data)
+            print(reachable)
+            break
 
 def run_client():
     if len(sys.argv) != 7:
@@ -40,11 +59,12 @@ def run_client():
     # bind takes a 2-tuple, not 2 arguments
     server_socket.connect(('localhost', int(sys.argv[2])))
 
-    # sends a UPDATEPOSITION to server once sensor starts up
-    tmp = "UPDATEPOSITION " + ID + " " + str(r) + " " + str(xPos) + " " + str(yPos)
-    server_socket.sendall(tmp.encode('utf-8'))
+
     inputs = [sys.stdin, server_socket]
     outputs = []
+
+    # sends a UPDATEPOSITION to server once sensor starts up
+    updatePosition(server_socket, inputs, outputs, ID, r, xPos, yPos)
 
     while True:
         readable, writeable, exception = select.select(inputs, outputs, inputs)
@@ -55,18 +75,7 @@ def run_client():
                 if (command[0] == 'MOVE'):
                     xPos =int(command[1])
                     yPos = int(command[2])
-                    sendmessage = "UPDATEPOSITION"
-                    sendmessage += " "+ID
-                    sendmessage += " "+ str(r)
-                    sendmessage += " "+ str(xPos)
-                    sendmessage += " "+ str(yPos)
-                    server_socket.send(sendmessage.encode('utf-8'))
-                    # they should receive a REACHABLE message
-                    while True:
-                        data = server_socket.recv(4096).decode("utf-8")
-                        command = data.split()
-                        if (command[0] == 'REACHABLE'):
-                            break
+                    updatePosition(server_socket, inputs, outputs, ID, r, xPos, yPos)
 
                 if (command[0] == 'SENDDATA'):
                     print("SENDDATA")
@@ -94,7 +103,7 @@ def run_client():
                         print("Receive THERE")
                         print(command)
                 else:
-                    print("Server has closed")
+                    #print("Server has closed")
                     #client_socket.close()
                     break
 

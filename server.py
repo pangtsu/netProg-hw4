@@ -3,14 +3,59 @@
 import sys  # For arg parsing
 import socket  # For sockets
 import select
-
-
+import math
+import json
 # python3 server.py [control port] [base station file]
 # i.e.,: python3 server.py 9000 base_stations.txt
 
+def getDistance(x1, y1, x2, y2):
+    # Loop through the client list and find the distance between the 
+    # sensor and every other sensor/bsae station
+    # it is reachable if both ranges are greater than or equal 
+    distance = math.sqrt(((x1-x2)**2)+((y1-y2)**2))
+    return distance
 
+# Loop through the client list and find the distance between the 
+# sensor and every other sensor/bsae station
+# it is reachable if both ranges are greater than or equal 
 def reachable(client_socket, IDToSearch, clients, base_stations):
-    pass
+
+    reachableList = {}
+    curR = clients[IDToSearch]["r"]
+    curX = clients[IDToSearch]["x"]
+    curY = clients[IDToSearch]["y"]
+
+    # loop through every sensor
+    for ID in clients:
+        destR = clients[ID]["r"]
+        destX = clients[ID]["x"]
+        destY = clients[ID]["y"]
+        d = getDistance(curX, curY, destX, destY)
+        if (curR >= d and destR >= d and ID != IDToSearch):
+            reachableList[ID] = {}
+            reachableList[ID]["d"] = d
+            reachableList[ID]["x"] = destX
+            reachableList[ID]["y"] = destY
+
+    # loop through every base station
+    for bs in base_stations:
+        destX = base_stations[bs]["x"]
+        destY = base_stations[bs]["y"]
+        d = getDistance(curX, curY, destX, destY)
+        if (curR >= d and bs != IDToSearch):
+            reachableList[bs] = {}
+            reachableList[bs]["d"] = d
+            reachableList[bs]["x"] = destX
+            reachableList[bs]["y"] = destY
+
+    send_string = "REACHABLE " + str(len(reachableList)) + " "
+
+    # simply serialize the dictionary? or using format specified in the instructions?
+    data_string = json.dumps(reachableList)
+    print(data_string)
+    send_string = send_string + data_string
+    
+    client_socket.sendall(send_string.encode('utf-8'))
 
 def sendTHERE(client_socket, IDToSearch, clients):
     finalString = "THERE " + IDToSearch + " " + str(clients[IDToSearch]["x"]) + " " + str(clients[IDToSearch]["y"])
@@ -29,9 +74,9 @@ def run_server():
         for line in fp:
             commands = line.split()
             base_stations[commands[0]] = {}
-            base_stations[commands[0]]["x"] = commands[1]
-            base_stations[commands[0]]["y"] = commands[2]
-            base_stations[commands[0]]["numLinks"] = commands[3]
+            base_stations[commands[0]]["x"] = int(commands[1])
+            base_stations[commands[0]]["y"] = int(commands[2])
+            base_stations[commands[0]]["numLinks"] = int(commands[3])
             base_stations[commands[0]]["linkList"] = []
             for i in range(4, len(commands)):
                 base_stations[commands[0]]["linkList"].append(commands[i])
@@ -86,13 +131,14 @@ def run_server():
                         clients[args[1]]["x"] = int(args[3])
                         clients[args[1]]["y"] = int(args[4])
                         reachable(s, command[1], clients, base_stations)
+                        #print(reachableList)
 
                     elif (command[0] == 'DATAMESSAGE'):
                         print("DATAMESSAGE")
                         printf("Server received {len(message)} bytes: \"{message}\"")
 
                 else:
-                    print("Client has closed")
+                    #print("Client has closed")
                     #client_socket.close()
                     break
 
