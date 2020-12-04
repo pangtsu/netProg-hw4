@@ -8,6 +8,10 @@ import select
 # python3 server.py [control port] [base station file]
 # i.e.,: python3 server.py 9000 base_stations.txt
 
+
+def reachable(client_socket, IDToSearch, clients, base_stations):
+    pass
+
 def sendTHERE(client_socket, IDToSearch, clients):
     finalString = "THERE " + IDToSearch + " " + str(clients[IDToSearch]["x"]) + " " + str(clients[IDToSearch]["y"])
     client_socket.sendall(finalString.encode('utf-8'))
@@ -17,7 +21,6 @@ def run_server():
         printf("Proper usage is {sys.argv[0]} [control port] [base station file]")
         sys.exit(0)
 
-    sensorLocations = {}
     base_stations = {}
     clients = {}
     # Reads the base station file and parse each line
@@ -82,7 +85,8 @@ def run_server():
                         clients[args[1]]["r"] = int(args[2])
                         clients[args[1]]["x"] = int(args[3])
                         clients[args[1]]["y"] = int(args[4])
-                        print(clients)
+                        reachable(s, command[1], clients, base_stations)
+
                     elif (command[0] == 'DATAMESSAGE'):
                         print("DATAMESSAGE")
                         printf("Server received {len(message)} bytes: \"{message}\"")

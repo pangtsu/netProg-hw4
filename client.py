@@ -21,10 +21,11 @@ def sendWhere(server_socket, inputs, outputs, IDToSearch):
     # send WHERE message
     server_socket.sendall(send_string.encode('utf-8'))
     while True:
-        data = server_socket.recv(4096)
-        if data.startswith("THERE"):
-            break;
-
+        data = server_socket.recv(4096).decode("utf-8")
+        command = data.split()
+        if (command[0] == 'THERE'):
+            break
+        print("THERE is received")
 
 def run_client():
     if len(sys.argv) != 7:
@@ -54,8 +55,6 @@ def run_client():
                 if (command[0] == 'MOVE'):
                     xPos =int(command[1])
                     yPos = int(command[2])
-                    # senddata [SensorID] [SensorRange] [CurrentXPosition] [CurrentYPosition]
-                    #self.senddata("UPDATEPOSITION",[self.sensor_id,self.sensor_range,self.x,self.y])
                     sendmessage = "UPDATEPOSITION"
                     sendmessage += " "+ID
                     sendmessage += " "+ str(r)
@@ -64,9 +63,10 @@ def run_client():
                     server_socket.send(sendmessage.encode('utf-8'))
                     # they should receive a REACHABLE message
                     while True:
-                        data = server_socket.recv(4096)
-                        if data.startswith("REACHABLE"):
-                            break;
+                        data = server_socket.recv(4096).decode("utf-8")
+                        command = data.split()
+                        if (command[0] == 'REACHABLE'):
+                            break
 
                 if (command[0] == 'SENDDATA'):
                     print("SENDDATA")
