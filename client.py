@@ -10,10 +10,6 @@ import json
 
 
 
-
-
-
-
 def sendWhere(server_socket, inputs, outputs, IDToSearch):
     # package where message
     send_string = "WHERE " + str(IDToSearch)
@@ -24,7 +20,7 @@ def sendWhere(server_socket, inputs, outputs, IDToSearch):
         data = server_socket.recv(4096).decode("utf-8")
         command = data.split()
         if (command[0] == 'THERE'):
-            print("THERE is received")
+            print("server: " + data)
             break
 
 def updatePosition(server_socket, inputs, outputs, ID, r, xPos, yPos):
@@ -73,14 +69,15 @@ def run_client():
                 line = sys.stdin.readline()
                 command = line.split()
                 if (command[0] == 'MOVE'):
+                    print("client: MOVE")
                     xPos =int(command[1])
                     yPos = int(command[2])
                     updatePosition(server_socket, inputs, outputs, ID, r, xPos, yPos)
 
                 if (command[0] == 'SENDDATA'):
-                    print("SENDDATA")
-                    send_string = "WHERE"
-                    server_socket.sendall(send_string.encode('utf-8'))
+                    print("client: SENDDATA")
+                    #send_string = "WHERE"
+                    #server_socket.sendall(send_string.encode('utf-8'))
 
                 # ~~~~~~~ CJ's testing Code
                 elif (command[0] == 'WHERE'):
@@ -96,12 +93,7 @@ def run_client():
                 if message:
                     command = message.split()
                     if (command[0] == 'DATAMESSAGE'):
-                        print("WHERE")
-                    #client_socket.send(message)
-
-                    elif (command[0] == 'THERE'):
-                        print("Receive THERE")
-                        print(command)
+                        print("server: DATAMESSAGE")
                 else:
                     #print("Server has closed")
                     #client_socket.close()

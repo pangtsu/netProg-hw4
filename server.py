@@ -58,6 +58,7 @@ def reachable(client_socket, IDToSearch, clients, base_stations):
 
 def sendTHERE(client_socket, IDToSearch, clients):
     finalString = "THERE " + IDToSearch + " " + str(clients[IDToSearch]["x"]) + " " + str(clients[IDToSearch]["y"])
+    print(finalString)
     client_socket.sendall(finalString.encode('utf-8'))
 
 def run_server():
@@ -95,16 +96,18 @@ def run_server():
     while True:
         readable, writeable, exception = select.select(inputs, outputs, inputs)
         for s in readable:
+
             if s is sys.stdin:
                 line = sys.stdin.readline()
                 command = line.split()
 
                 if (command[0] == 'SENDDATA'):
-                    print("SENDDATA")
+                    print("server: SENDDATA")
 
                 elif (command[0] == 'QUIT'):
-                    print("QUIT")
+                    print("server: QUIT")
 
+            # if new socket connection
             elif s is listening_socket:
                 (client_socket, address) = s.accept()
                 client_socket.setblocking(0)
@@ -112,28 +115,26 @@ def run_server():
                 sockets.append(client_socket)
                 print("new socket added")
 
+            # if one of the sockets receives something
             else:
-                # needs to encode bystring to string
-                message = s.recv(1024).decode('utf-8')
+                message = s.recv(1024).decode('utf-8') # needs to encode bystring to string
                 if message:
                     command = message.split()
                     if (command[0] == 'WHERE'):
-                        print("WHERE:")
+                        print("client: " + message)
                         sendTHERE(s, command[1], clients)
-                        # This is where you call the THERE function. I think
 
                     elif (command[0] == 'UPDATEPOSITION'):
-                        print(message)
+                        print("client: " + message)
                         args = message.split()
                         clients[args[1]] = {}
                         clients[args[1]]["r"] = int(args[2])
                         clients[args[1]]["x"] = int(args[3])
                         clients[args[1]]["y"] = int(args[4])
                         reachable(s, command[1], clients, base_stations)
-                        #print(reachableList)
 
                     elif (command[0] == 'DATAMESSAGE'):
-                        print("DATAMESSAGE")
+                        print("client: DATAMESSAGE")
                         printf("Server received {len(message)} bytes: \"{message}\"")
 
                 else:
