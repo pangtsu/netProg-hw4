@@ -14,8 +14,16 @@ import select
 
 
 
-
-
+def sendWhere(server_socket, inputs, outputs, IDToSearch):
+    # package where message
+    send_string = "WHERE " + str(IDToSearch)
+    
+    # send WHERE message
+    server_socket.sendall(send_string.encode('utf-8'))
+    while True:
+        data = server_socket.recv(4096)
+        if data.startswith("THERE"):
+            break;
 
 
 def run_client():
@@ -60,11 +68,6 @@ def run_client():
                         if data.startswith("REACHABLE"):
                             break;
 
-
-
-
-
-
                 if (command[0] == 'SENDDATA'):
                     print("SENDDATA")
                     send_string = "WHERE"
@@ -98,10 +101,6 @@ def run_client():
     # Disconnect from the server
     print("Closing connection to server")
     server_socket.close()
-
-    # Print the response to standard output, both as byte stream and decoded text
-    print("Received {recv_string} from the server")
-    print("Decoding, received {recv_string.decode('utf-8')} from the server")
 
 if __name__ == '__main__':
     run_client()
