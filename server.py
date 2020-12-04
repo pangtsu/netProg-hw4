@@ -6,7 +6,7 @@ import select
 import math
 import json
 # python3 server.py [control port] [base station file]
-# i.e.,: python3 server.py 9000 base_stations.txt
+# i.e.,: python3 server.py 8071 base_stations.txt
 
 def getDistance(x1, y1, x2, y2):
     # Loop through the client list and find the distance between the 
@@ -52,8 +52,7 @@ def reachable(client_socket, IDToSearch, clients, base_stations):
 
     # simply serialize the dictionary? or using format specified in the instructions?
     data_string = json.dumps(reachableList)
-    print(data_string)
-    send_string = send_string + data_string
+    send_string += data_string
     
     client_socket.sendall(send_string.encode('utf-8'))
 

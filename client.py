@@ -5,7 +5,7 @@ import socket  # For sockets
 import select
 import json
 # python3 client.py [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]
-# i.e.,: python3 client.py control 9000 client1 10 5 5
+# i.e.,: python3 client.py control 8071 client1 10 5 5
 # [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]
 
 
