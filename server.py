@@ -56,10 +56,34 @@ def reachable(client_socket, IDToSearch, clients, base_stations):
     
     client_socket.sendall(send_string.encode('utf-8'))
 
+# Take in a list of reachable sensors/base-stations and remove items in the hoplist from reachableList
+# Returns the ID of item in reachableList that is closest to destination and NOT in hopList
+def getClosestValidReachable(reachableList, destX, destY, hopList):
+    for ID in reachableList:
+        if ID in hopList:
+            reachableList.remove(ID)
+    minDistance = -1
+    closestId= ''
+    for ID in reachableList:
+        itemDistance = getDistance(reachableList[ID][x], reachableList[ID][y], destX, destY)
+        if minDistance == -1 or itemDistance < minDistance:
+            minDistance = itemDistance
+            closestID = ID
+
+    return closestID
+
+    
+
+    
+
+
 def sendTHERE(client_socket, IDToSearch, clients):
     finalString = "THERE " + IDToSearch + " " + str(clients[IDToSearch]["x"]) + " " + str(clients[IDToSearch]["y"])
     print(finalString)
     client_socket.sendall(finalString.encode('utf-8'))
+
+def handleDataMessage():
+
 
 def run_server():
     if len(sys.argv) != 3:
@@ -101,8 +125,30 @@ def run_server():
                 line = sys.stdin.readline()
                 command = line.split()
 
+               
                 if (command[0] == 'SENDDATA'):
-                    print("server: SENDDATA")
+                    originID = command[1]
+                    destID = command[2]
+                    hopListLength = 0
+                    hopList = []
+                    nextID = ''
+
+                     '''
+                    If the[OriginID] is CONTROL then when deciding the next hop, all base stations should be considered
+                    reachable, and the [NextID] must be a base station
+                     '''
+                    if originID == 'CONTROL':
+                        
+                    
+                    '''
+                     If the [OriginID] is a base station, then the
+                    next hop should be decided based on what is reachable from the base station with that [BaseID]. The
+                    [OriginID] will never be a sensor in this command.
+                    '''
+                    else:
+
+
+
 
                 elif (command[0] == 'QUIT'):
                     print("server: QUIT")
