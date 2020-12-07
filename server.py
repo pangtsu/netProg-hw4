@@ -18,7 +18,7 @@ def getDistance(x1, y1, x2, y2):
 # Loop through the client list and find the distance between the 
 # sensor and every other sensor/bsae station
 # it is reachable if both ranges are greater than or equal 
-def reachable(client_socket, IDToSearch, clients, base_stations):
+def reachable(IDToSearch, clients, base_stations):
 
     reachableList = {}
     curR = clients[IDToSearch]["r"]
@@ -49,6 +49,34 @@ def reachable(client_socket, IDToSearch, clients, base_stations):
             reachableList[bs]["y"] = destY
 
     return(reachableList)
+
+#similar to above function. But specifically for what is reachable from a base station. 
+# I.e A base station is only reachable to another base station if they are directly linked
+# Also, base stations have infinite range so they're range is not considered
+def reachableFromBaseStation(IDToSearch, clients, base_stations):
+    reachableList = {}
+    curX = base_stations[IDToSearch]["x"]
+    curY = base_stations[IDToSearch]["y"]
+
+    # loop through every sensor
+    for ID in clients:
+        destR = clients[ID]["r"]
+        destX = clients[ID]["x"]
+        destY = clients[ID]["y"]
+        d = getDistance(curX, curY, destX, destY)
+        if (destR >= d and ID != IDToSearch):
+            reachableList[ID] = {}
+            reachableList[ID]["d"] = d
+            reachableList[ID]["x"] = destX
+            reachableList[ID]["y"] = destY
+
+    # loop through every base station
+    for bs in base_stations:
+        if bs in base_stations[IDToSearch]["linklist"]:
+            reachableList[bs]["x"] = base_stations[bs]["x"]
+            reachableList[bs]["y"] = base_stations[bs]["y"]
+    return(reachableList)
+
 
 # Take in a list of reachable sensors/base-stations and remove items in the hoplist from reachableList
 # Returns the ID of item in reachableList that is closest to destination and NOT in hopList
@@ -136,7 +164,7 @@ def run_server():
                     nextID = ''
 
                      '''
-                    If the[OriginID] is CONTROL then when deciding the next hop, all base stations should be considered
+                    If the [OriginID] is CONTROL then when deciding the next hop, all base stations should be considered
                     reachable, and the [NextID] must be a base station
                      '''
                     if originID == 'CONTROL':
@@ -151,8 +179,11 @@ def run_server():
                     '''
                     else:
                         destX, destY = getLocation(destID, clients, base_stations)
-                        reachableFromBaseStation = 
-                        nextId = getClosestValidReachable()
+                        reachableFromBaseStation = reachable(,clients, base_stations)
+                        
+                        #Remove all base stations that are not directly linked to this base stations
+                        for reachableItem in reachableFromBaseStation:
+                            if (reachableItem in base_stations) and (reachableItem not in base_stations[]
 
 
 
