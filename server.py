@@ -161,7 +161,6 @@ def run_server():
                     destID = command[2]
                     hopListLength = 0
                     hopList = []
-                    nextID = ''
 
                      '''
                     If the [OriginID] is CONTROL then when deciding the next hop, all base stations should be considered
@@ -170,20 +169,21 @@ def run_server():
                     if originID == 'CONTROL':
                         destX, destY = getLocation(destID, clients, base_stations)
                         nextID = getClosestValidReachable(base_stations.copy(), destX, destY, [])
+                        datamessage = 'DATAMESSAGE ' + originID + ' ' + nextID ' ' destID + ' ' + str(hopListLength) + ' ' + json.dumps(hopList)
+
                             
                     
                     '''
-                     If the [OriginID] is a base station, then the
+                    If the [OriginID] is a base station, then the
                     next hop should be decided based on what is reachable from the base station with that [BaseID]. The
                     [OriginID] will never be a sensor in this command.
                     '''
                     else:
                         destX, destY = getLocation(destID, clients, base_stations)
-                        reachableFromBaseStation = reachable(,clients, base_stations)
+                        reachableList = reachableFromBaseStation(originID, clients, base_stations)
+                        nextID = getClosestValidReachable(reachableList.copy, destX, destY)
+                        datamessage = 'DATAMESSAGE ' + originID + ' ' + nextID ' ' destID + ' ' + str(hopListLength) + ' ' + json.dumps(hopList)
                         
-                        #Remove all base stations that are not directly linked to this base stations
-                        for reachableItem in reachableFromBaseStation:
-                            if (reachableItem in base_stations) and (reachableItem not in base_stations[]
 
 
 
