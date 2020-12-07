@@ -48,13 +48,7 @@ def reachable(client_socket, IDToSearch, clients, base_stations):
             reachableList[bs]["x"] = destX
             reachableList[bs]["y"] = destY
 
-    send_string = "REACHABLE " + str(len(reachableList)) + " "
-
-    # simply serialize the dictionary? or using format specified in the instructions?
-    data_string = json.dumps(reachableList)
-    send_string += data_string
-    
-    client_socket.sendall(send_string.encode('utf-8'))
+    return(reachableList)
 
 # Take in a list of reachable sensors/base-stations and remove items in the hoplist from reachableList
 # Returns the ID of item in reachableList that is closest to destination and NOT in hopList
@@ -190,7 +184,13 @@ def run_server():
                         clients[args[1]]["r"] = int(args[2])
                         clients[args[1]]["x"] = int(args[3])
                         clients[args[1]]["y"] = int(args[4])
-                        reachable(s, command[1], clients, base_stations)
+                        reachableList = reachable( command[1], clients, base_stations)
+                        send_string = "REACHABLE " + str(len(reachableList)) + " "
+                        # simply serialize the dictionary? or using format specified in the instructions?
+                        data_string = json.dumps(reachableList)
+                        send_string += data_string
+    
+    client_socket.sendall(send_string.encode('utf-8'))
 
                     elif (command[0] == 'DATAMESSAGE'):
                         print("client: DATAMESSAGE")
