@@ -72,14 +72,22 @@ def getClosestValidReachable(reachableList, destX, destY, hopList):
 
     return closestID
 
-    
+#gets x,y locaitons of client or base station that is being inquired about
+def getLocation(IDToSearch, clients, base_stations):
+    x = -1 
+    y = -1
+    if IDToSearch in base_stations:
+        x = base_stations[IDToSearch]["x"]
+        y = base_stations[IDToSearch]["y"]
+    else:
+        x = clients[IDToSearch]["x"]
+        y = clients[IDToSearch]["y"]
+    return x,y
 
-    
-
-
-def sendTHERE(client_socket, IDToSearch, clients):
-    finalString = "THERE " + IDToSearch + " " + str(clients[IDToSearch]["x"]) + " " + str(clients[IDToSearch]["y"])
-    print(finalString)
+# Sends THERE string to client with x,y location of client or base station that is being inquired about
+def sendTHERE(client_socket, IDToSearch, clients, base_stations):
+    x,y = getLocation(IDToSearch, clients, base_stations)
+    finalString = "THERE " + IDToSearch + " " + str(x]) + " " + str(y)
     client_socket.sendall(finalString.encode('utf-8'))
 
 def handleDataMessage():
@@ -138,7 +146,9 @@ def run_server():
                     reachable, and the [NextID] must be a base station
                      '''
                     if originID == 'CONTROL':
-                        
+                        destX, destY = getLocation(destID, clients, base_stations)
+                        nextID = getClosestValidReachable(base_stations.copy(), destX, destY, [])
+                            
                     
                     '''
                      If the [OriginID] is a base station, then the
@@ -146,6 +156,9 @@ def run_server():
                     [OriginID] will never be a sensor in this command.
                     '''
                     else:
+                        destX, destY = getLocation(destID, clients, base_stations)
+                        reachableFromBaseStation = 
+                        nextId = getClosestValidReachable()
 
 
 
