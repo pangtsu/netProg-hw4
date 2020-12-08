@@ -22,9 +22,7 @@ def sendWhere(server_socket, inputs, outputs, IDToSearch):
     while True:
         data = server_socket.recv(4096).decode("utf-8")
         command = data.split()
-        print(data)
         if (command[0] == 'THERE'):
-            print("server: " + data)
             return data
 
 # Calls recDataMessage. Might cause errors with printing stuff
@@ -52,7 +50,6 @@ def updatePosition(server_socket, inputs, outputs, ID, r, xPos, yPos):
             numReachable = command[1]
             string_data = data.split(" ", 2)[2]
             reachable = json.loads(string_data)
-            print(reachable)
             return reachable
 
 
@@ -86,7 +83,6 @@ def recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, message):
     numReachable = len(reachableNodes)
 
     s = sendWhere(server_socket, inputs, outputs, destID)
-    print("Called where: " + str(s))
     ary = s.split(' ')
     assert ary[0] == "THERE", "message is not THERE"
     destX = int(ary[2])
@@ -117,7 +113,7 @@ def recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, message):
         elif (ID == originID):
             print("" + ID + ": Sent a new message bound for " + destID)
         else:
-            print("" + ID + ": Message from " + originID + " to " + destID + " being forwarded through" + nextID)
+            print("" + ID + ": Message from " + originID + " to " + destID + " being forwarded through " + nextID)
             
         send_string = "DATAMESSAGE " + originID + " " + nextID + " " + destID + " " + str(hopListLength) + " " + str(hopList) # Might have an error: hoplist might need to be updated
         server_socket.sendall(send_string.encode('utf-8'))
@@ -179,7 +175,7 @@ def run_client():
                     command = message.split()
                     if (command[0] == 'DATAMESSAGE'):
                         print("server: DATAMESSAGE")
-                        recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, line)
+                        recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, message)
                 else:
                     #print("Server has closed")
                     #client_socket.close()
