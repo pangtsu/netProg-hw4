@@ -261,7 +261,7 @@ def run_server():
                     command = message.split()
                     if (command[0] == 'WHERE'):
                         print("client: " + message)
-                        sendTHERE(s, command[1], clients)
+                        sendTHERE(s, command[1], clients, base_stations)
 
                     elif (command[0] == 'UPDATEPOSITION'):
                         print("client: " + message)

@@ -22,6 +22,7 @@ def sendWhere(server_socket, inputs, outputs, IDToSearch):
     while True:
         data = server_socket.recv(4096).decode("utf-8")
         command = data.split()
+        print(data)
         if (command[0] == 'THERE'):
             print("server: " + data)
             return data
@@ -30,7 +31,7 @@ def sendWhere(server_socket, inputs, outputs, IDToSearch):
 def sendData(server_socket, inputs, outputs, ID, r, xPos, yPos, line):
     data = line.split(' ')
     assert data[0] == "SENDDATA", "message is not senddata. Message: " + line
-    destID = line[1]
+    destID = data[1]
     s = "DATAMESSAGE " + ID + " nextID " + destID + " 0 0"
     recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, s)
 
@@ -65,14 +66,14 @@ test this in general
 """
 # DATAMESSAGE [OriginID] [NextID] [DestinationID] [HopListLength] [HopList]
 def recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, message):
-    dataMessage = message.split(' ')
+    dataMessage = message.split(' ', 5)
     assert len(dataMessage) == 6, "Incorrect length of message (length is " + str(len(dataMessage)) + ")"
     assert dataMessage[0] == "DATAMESSAGE", "message is not DATAMESSAGE"
     originID = dataMessage[1]
     nextID = dataMessage[2]
     destID = dataMessage[3]
     hopListLength = int(dataMessage[4])
-    hopList = dataMessage[5]
+    hopList = dataMessage[5] # might want to change to json.loads
 
     # Check if we're at destination
     # UNCOMMENT THIS CODE WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWw
@@ -89,7 +90,6 @@ def recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, message):
     print("Called where: " + str(s))
     ary = s.split(' ')
     assert ary[0] == "THERE", "message is not THERE"
-    assert ary[1] == destID, "id is not correct"
     destX = int(ary[2])
     destY = int(ary[3])
     
