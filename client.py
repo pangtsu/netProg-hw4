@@ -87,7 +87,7 @@ def recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, message):
     assert ary[0] == "THERE", "message is not THERE"
     destX = int(ary[2])
     destY = int(ary[3])
-    
+
     # Find closest node
     closestID = "-9999"
     closestDist = math.inf
@@ -99,7 +99,7 @@ def recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, message):
             if (dist < closestDist or (dist == closestDist and reachID < closestID)):
                 closestDist = dist
                 closestID = reachID
-
+                
     # Print result and send it
     if (closestID == "-9999" and math.isinf(closestDist)):
         print("" + ID + ": Message from " + originID + " to " + destID + " could not be delivered.")
