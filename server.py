@@ -72,7 +72,8 @@ def reachableFromBaseStation(IDToSearch, clients, base_stations):
 
     # loop through every base station
     for bs in base_stations:
-        if bs in base_stations[IDToSearch]["linklist"]:
+        if bs in base_stations[IDToSearch]["linkList"]:
+            reachableList[bs] = {}
             reachableList[bs]["x"] = base_stations[bs]["x"]
             reachableList[bs]["y"] = base_stations[bs]["y"]
     return(reachableList)
@@ -81,13 +82,13 @@ def reachableFromBaseStation(IDToSearch, clients, base_stations):
 # Take in a list of reachable sensors/base-stations and remove items in the hoplist from reachableList
 # Returns the ID of item in reachableList that is closest to destination and NOT in hopList
 def getClosestValidReachable(reachableList, destX, destY, hopList):
-    for ID in reachableList:
-        if ID in hopList:
-            reachableList.remove(ID)
+    for ID in hopList:
+        if ID in reachableList:
+            reachableList.pop(ID)
     minDistance = -1
     closestId= ''
     for ID in reachableList:
-        itemDistance = getDistance(reachableList[ID][x], reachableList[ID][y], destX, destY)
+        itemDistance = getDistance(reachableList[ID]['x'], reachableList[ID]['y'], destX, destY)
         if minDistance == -1 or itemDistance < minDistance:
             minDistance = itemDistance
             closestID = ID
@@ -109,11 +110,59 @@ def getLocation(IDToSearch, clients, base_stations):
 # Sends THERE string to client with x,y location of client or base station that is being inquired about
 def sendTHERE(client_socket, IDToSearch, clients, base_stations):
     x,y = getLocation(IDToSearch, clients, base_stations)
-    finalString = "THERE " + IDToSearch + " " + str(x]) + " " + str(y)
+    finalString = "THERE " + IDToSearch + " " + str(x) + " " + str(y)
     client_socket.sendall(finalString.encode('utf-8'))
 
-def handleDataMessage():
+#Takes in full DATAMESSAGE string and decides next move base do what is given
+def handleDataMessage(dataMessage, base_stations, clients):
+    dataMessage = dataMessage.split(' ', 5)
+    print(dataMessage)
+    originID = dataMessage[1]
+    nextID = dataMessage[2]
+    destID = dataMessage[3]
+    hopListLength = int(dataMessage[4])
+    hopList = json.loads(dataMessage[5])
 
+
+
+    
+    if nextID in clients:
+        hopList.append(nextID)
+        hopListLength += 1
+        dataMessage = 'DATAMESSAGE ' + originID + ' ' + nextID + ' ' + destID + ' ' + str(len(hopList)) + ' ' + json.dumps(hopList)
+        clients[nextID]["socket"].sendall(dataMessage.encode('utf-8'))
+        #update hopList
+        #SEND to correct client here
+
+    else:
+        while nextID in base_stations:
+            reachableList = reachableFromBaseStation(nextID, clients, base_stations)
+            destX, destY = getLocation(destID, clients, base_stations)
+            newNextID = getClosestValidReachable(reachableList.copy(), destX, destY, hopList)
+            if nextID == destID:
+                print("{}: message from  {} to {} successfully received".format(destID, originID, destID))
+                break
+            elif newNextID == '':
+                print('{}: Message from {} to {} could not be delivered.'.format(nextID, originID, destID))
+                break
+            else:
+                print('{}: Message from {} to {} being forwarded through {}'.format(nextID, originID, destID, newNextID))
+                hopList.append(newNextID)
+                nextID = newNextID
+                if nextID in clients:
+                     dataMessage = 'DATAMESSAGE ' + originID + ' ' + nextID + ' ' + destID + ' ' + str(len(hopList)) + ' ' + json.dumps(hopList)
+                     clients[nextID]["socket"].sendall(dataMessage.encode('utf-8'))
+                     break
+
+
+
+
+
+
+
+
+
+    return
 
 def run_server():
     if len(sys.argv) != 3:
@@ -159,30 +208,36 @@ def run_server():
                 if (command[0] == 'SENDDATA'):
                     originID = command[1]
                     destID = command[2]
-                    hopListLength = 0
-                    hopList = []
 
-                     '''
+                    '''
                     If the [OriginID] is CONTROL then when deciding the next hop, all base stations should be considered
                     reachable, and the [NextID] must be a base station
-                     '''
+                    '''
                     if originID == 'CONTROL':
                         destX, destY = getLocation(destID, clients, base_stations)
                         nextID = getClosestValidReachable(base_stations.copy(), destX, destY, [])
-                        datamessage = 'DATAMESSAGE ' + originID + ' ' + nextID ' ' destID + ' ' + str(hopListLength) + ' ' + json.dumps(hopList)
-
-                            
+                        hopList = [originID, nextID]
+                        datamessage = 'DATAMESSAGE ' + originID + ' ' + nextID + ' '+  destID + ' ' + str(len(hopList)) + ' ' + json.dumps(hopList)
+                        handleDataMessage(datamessage, base_stations, clients)
                     
-                    '''
-                    If the [OriginID] is a base station, then the
-                    next hop should be decided based on what is reachable from the base station with that [BaseID]. The
-                    [OriginID] will never be a sensor in this command.
-                    '''
+ 
                     else:
+                        '''
+                        If the [OriginID] is a base station, then the
+                        next hop should be decided based on what is reachable from the base station with that [BaseID]. The
+                        [OriginID] will never be a sensor in this command.
+                        '''
+
                         destX, destY = getLocation(destID, clients, base_stations)
                         reachableList = reachableFromBaseStation(originID, clients, base_stations)
-                        nextID = getClosestValidReachable(reachableList.copy, destX, destY)
-                        datamessage = 'DATAMESSAGE ' + originID + ' ' + nextID ' ' destID + ' ' + str(hopListLength) + ' ' + json.dumps(hopList)
+                        nextID = getClosestValidReachable(reachableList.copy(), destX, destY, [])
+                        hopList = [originID, nextID]
+                        datamessage = 'DATAMESSAGE ' + originID + ' ' + nextID + ' ' + destID + ' ' + str(len(hopList)) + ' ' + json.dumps(hopList)
+                        if(nextID == destID):
+                            print('{}: Sent a new message directly to {}.'.format(originID, destID))
+                        else:
+                            print('{}: Sent a new message bound for {}.'.format(originID, destID ))
+                        handleDataMessage(datamessage, base_stations, clients)
                         
 
 
@@ -215,13 +270,13 @@ def run_server():
                         clients[args[1]]["r"] = int(args[2])
                         clients[args[1]]["x"] = int(args[3])
                         clients[args[1]]["y"] = int(args[4])
+                        clients[args[1]]["socket"] = s
                         reachableList = reachable( command[1], clients, base_stations)
                         send_string = "REACHABLE " + str(len(reachableList)) + " "
                         # simply serialize the dictionary? or using format specified in the instructions?
                         data_string = json.dumps(reachableList)
                         send_string += data_string
-    
-    client_socket.sendall(send_string.encode('utf-8'))
+                        s.sendall(send_string.encode('utf-8'))
 
                     elif (command[0] == 'DATAMESSAGE'):
                         print("client: DATAMESSAGE")
