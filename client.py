@@ -53,15 +53,6 @@ def updatePosition(server_socket, inputs, outputs, ID, r, xPos, yPos):
             return reachable
 
 
-"""
-Things I haven't done:
-updatePosition: figure out what it returns??
-
-test where
-
-test this in general
-
-"""
 # DATAMESSAGE [OriginID] [NextID] [DestinationID] [HopListLength] [HopList]
 def recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, message):
     dataMessage = message.split(' ', 5)
@@ -151,13 +142,11 @@ def run_client():
                 line = sys.stdin.readline().strip()
                 command = line.split()
                 if (command[0] == 'MOVE'):
-                    print("client: MOVE")
                     xPos =int(command[1])
                     yPos = int(command[2])
                     updatePosition(server_socket, inputs, outputs, ID, r, xPos, yPos)
 
                 if (command[0] == 'SENDDATA'):
-                    print("client: SENDDATA")
                     sendData(server_socket, inputs, outputs, ID, r, xPos, yPos, line)
                     #send_string = "WHERE"
                     #server_socket.sendall(send_string.encode('utf-8'))
@@ -168,16 +157,11 @@ def run_client():
 
                 elif (command[0] == 'QUIT'):
                     print("QUIT")
-                # THIS IS JUST FOR DEBUGGING: REMOVE THE FOLLOWING AFTER FINISHED TESTING
-                elif (command[0] == 'DATAMESSAGE'):
-                    print("server: DATAMESSAGE")
-                    recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, line)
             else:
                 message = s.recv(1024).decode("utf-8")
                 if message:
                     command = message.split()
                     if (command[0] == 'DATAMESSAGE'):
-                        print("server: DATAMESSAGE")
                         recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, message)
                 else:
                     #print("Server has closed")

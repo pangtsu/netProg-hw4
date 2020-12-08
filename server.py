@@ -115,7 +115,6 @@ def sendTHERE(client_socket, IDToSearch, clients, base_stations):
 
 #Takes in full DATAMESSAGE string and decides next move base do what is given
 def handleDataMessage(dataMessage, base_stations, clients):
-    print(dataMessage)
     dataMessage = dataMessage.split(' ', 5)
     originID = dataMessage[1]
     nextID = dataMessage[2]
