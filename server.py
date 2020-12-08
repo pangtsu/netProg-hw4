@@ -63,7 +63,7 @@ def sendTHERE(client_socket, IDToSearch, clients):
 
 def run_server():
     if len(sys.argv) != 3:
-        printf("Proper usage is {sys.argv[0]} [control port] [base station file]")
+        print("Proper usage is {sys.argv[0]} [control port] [base station file]")
         sys.exit(0)
 
     base_stations = {}
@@ -135,7 +135,8 @@ def run_server():
 
                     elif (command[0] == 'DATAMESSAGE'):
                         print("client: DATAMESSAGE")
-                        printf("Server received {len(message)} bytes: \"{message}\"")
+                        print("Server received {len(message)} bytes: \"{message}\"")
+                        print("Okay basically server received this: " + message)
 
                 else:
                     #print("Client has closed")
