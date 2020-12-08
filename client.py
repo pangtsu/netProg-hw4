@@ -71,7 +71,7 @@ def recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, message):
     nextID = dataMessage[2]
     destID = dataMessage[3]
     hopListLength = int(dataMessage[4])
-    hopList = dataMessage[5] # might want to change to json.loads
+    hopList = json.loads(dataMessage[5]) # might want to change to json.loads
 
     # Check if we're at destination
     if (ID == destID):
@@ -107,6 +107,8 @@ def recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, message):
         # Package result
         currentID = nextID
         nextID = closestID
+        hopList.append(nextID)
+        hopListLength += 1
         # hopList += "," + ID   # control will add nextID to hoplist
         # hopeListLength += 1
         if (ID == originID and nextID == destID):
@@ -116,7 +118,7 @@ def recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, message):
         else:
             print("" + ID + ": Message from " + originID + " to " + destID + " being forwarded through " + currentID)
             
-        send_string = "DATAMESSAGE " + originID + " " + nextID + " " + destID + " " + str(hopListLength) + " " + str(hopList) # Might have an error: hoplist might need to be updated
+        send_string = "DATAMESSAGE " + originID + " " + nextID + " " + destID + " " + str(hopListLength) + " " + json.dumps(hopList) # Might have an error: hoplist might need to be updated
         server_socket.sendall(send_string.encode('utf-8'))
     return
 

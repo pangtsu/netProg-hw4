@@ -86,7 +86,7 @@ def getClosestValidReachable(reachableList, destX, destY, hopList):
         if ID in reachableList:
             reachableList.pop(ID)
     minDistance = -1
-    closestId= ''
+    closestID= ''
     for ID in reachableList:
         itemDistance = getDistance(reachableList[ID]['x'], reachableList[ID]['y'], destX, destY)
         if minDistance == -1 or itemDistance < minDistance:
@@ -143,6 +143,7 @@ def handleDataMessage(dataMessage, base_stations, clients):
                 print("{}: message from  {} to {} successfully received".format(destID, originID, destID))
                 break
             elif newNextID == '':
+                print('{}: Message from {} to {} being forwarded through {}'.format(nextID, originID, destID, nextID))
                 print('{}: Message from {} to {} could not be delivered.'.format(nextID, originID, destID))
                 break
             else:
@@ -252,7 +253,7 @@ def run_server():
                 client_socket.setblocking(0)
                 inputs.append(client_socket)
                 sockets.append(client_socket)
-                
+
             # if one of the sockets receives something
             else:
                 message = s.recv(1024).decode('utf-8') # needs to encode bystring to string
