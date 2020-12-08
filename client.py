@@ -77,11 +77,9 @@ def recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, message):
     hopList = dataMessage[5] # might want to change to json.loads
 
     # Check if we're at destination
-    # UNCOMMENT THIS CODE WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWw
-    """
     if (ID == destID):
         print("" + ID + ": Message from " + originID + " to " + destID + " succesfully received.")
-        return"""
+        return
 
     # Check reachable nodes
     reachableNodes = updatePosition(server_socket, inputs, outputs, ID, r, xPos, yPos)
