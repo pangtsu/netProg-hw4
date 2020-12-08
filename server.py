@@ -146,7 +146,7 @@ def handleDataMessage(dataMessage, base_stations, clients):
                 print('{}: Message from {} to {} could not be delivered.'.format(nextID, originID, destID))
                 break
             else:
-                print('{}: Message from {} to {} being forwarded through {}'.format(nextID, originID, destID, NextID))
+                print('{}: Message from {} to {} being forwarded through {}'.format(nextID, originID, destID, nextID))
                 hopList.append(newNextID)
                 nextID = newNextID
                 if nextID in clients:
