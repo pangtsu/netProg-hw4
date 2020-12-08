@@ -157,7 +157,6 @@ def run_client():
                     sendWhere(server_socket, inputs, outputs, IDToSearch)
 
                 elif (command[0] == 'QUIT'):
-                    print("QUITTING")
                     continuing = False
                     break
             else:

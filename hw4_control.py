@@ -196,7 +196,8 @@ def run_server():
     sockets = [listening_socket]
     outputs = []
 
-    while True:
+    continuing = True
+    while continuing:
         readable, writeable, exception = select.select(inputs, outputs, inputs)
         for s in readable:
 
@@ -244,7 +245,7 @@ def run_server():
 
 
                 elif (command[0] == 'QUIT'):
-                    print("QUITTING")
+                    continuing = False
                     break
 
             # if new socket connection
