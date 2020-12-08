@@ -179,7 +179,7 @@ def run_client():
                     command = message.split()
                     if (command[0] == 'DATAMESSAGE'):
                         print("server: DATAMESSAGE")
-                        recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, line)
+                        recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, message)
                 else:
                     #print("Server has closed")
                     #client_socket.close()
