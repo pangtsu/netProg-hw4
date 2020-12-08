@@ -252,19 +252,16 @@ def run_server():
                 client_socket.setblocking(0)
                 inputs.append(client_socket)
                 sockets.append(client_socket)
-                print("new socket added")
-
+                
             # if one of the sockets receives something
             else:
                 message = s.recv(1024).decode('utf-8') # needs to encode bystring to string
                 if message:
                     command = message.split()
                     if (command[0] == 'WHERE'):
-                        print("client: " + message)
                         sendTHERE(s, command[1], clients, base_stations)
 
                     elif (command[0] == 'UPDATEPOSITION'):
-                        print("client: " + message)
                         args = message.split()
                         clients[args[1]] = {}
                         clients[args[1]]["r"] = int(args[2])

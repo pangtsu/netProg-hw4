@@ -105,6 +105,7 @@ def recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, message):
         print("" + ID + ": Message from " + originID + " to " + destID + " could not be delivered.")
     else:
         # Package result
+        currentID = nextID
         nextID = closestID
         # hopList += "," + ID   # control will add nextID to hoplist
         # hopeListLength += 1
@@ -113,7 +114,7 @@ def recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, message):
         elif (ID == originID):
             print("" + ID + ": Sent a new message bound for " + destID)
         else:
-            print("" + ID + ": Message from " + originID + " to " + destID + " being forwarded through " + nextID)
+            print("" + ID + ": Message from " + originID + " to " + destID + " being forwarded through " + currentID)
             
         send_string = "DATAMESSAGE " + originID + " " + nextID + " " + destID + " " + str(hopListLength) + " " + str(hopList) # Might have an error: hoplist might need to be updated
         server_socket.sendall(send_string.encode('utf-8'))
