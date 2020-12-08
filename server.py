@@ -89,7 +89,7 @@ def getClosestValidReachable(reachableList, destX, destY, hopList):
     closestID= ''
     for ID in reachableList:
         itemDistance = getDistance(reachableList[ID]['x'], reachableList[ID]['y'], destX, destY)
-        if minDistance == -1 or itemDistance < minDistance:
+        if minDistance == -1 or itemDistance < minDistance or (itemDistance == minDistance and ID < closestID):
             minDistance = itemDistance
             closestID = ID
 
