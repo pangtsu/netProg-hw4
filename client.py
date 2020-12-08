@@ -135,7 +135,8 @@ def run_client():
     # sends a UPDATEPOSITION to server once sensor starts up
     updatePosition(server_socket, inputs, outputs, ID, r, xPos, yPos)
 
-    while True:
+    continuing = True
+    while continuing:
         readable, writeable, exception = select.select(inputs, outputs, inputs)
         for s in readable:
             if s is sys.stdin:
@@ -156,7 +157,9 @@ def run_client():
                     sendWhere(server_socket, inputs, outputs, IDToSearch)
 
                 elif (command[0] == 'QUIT'):
-                    print("QUIT")
+                    print("QUITTING")
+                    continuing = False
+                    break
             else:
                 message = s.recv(1024).decode("utf-8")
                 if message:

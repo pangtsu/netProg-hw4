@@ -244,7 +244,8 @@ def run_server():
 
 
                 elif (command[0] == 'QUIT'):
-                    print("server: QUIT")
+                    print("QUITTING")
+                    break
 
             # if new socket connection
             elif s is listening_socket:
