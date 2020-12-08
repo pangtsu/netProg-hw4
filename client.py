@@ -32,7 +32,8 @@ def sendData(server_socket, inputs, outputs, ID, r, xPos, yPos, line):
     data = line.split(' ')
     assert data[0] == "SENDDATA", "message is not senddata. Message: " + line
     destID = data[1]
-    s = "DATAMESSAGE " + ID + " nextID " + destID + " 0 0"
+    hoplist = [ID]
+    s = "DATAMESSAGE " + ID + " nextID " + destID + " 0 " + json.dumps(hoplist)
     recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, s)
 
 def updatePosition(server_socket, inputs, outputs, ID, r, xPos, yPos):
@@ -150,7 +151,7 @@ def run_client():
         readable, writeable, exception = select.select(inputs, outputs, inputs)
         for s in readable:
             if s is sys.stdin:
-                line = sys.stdin.readline()
+                line = sys.stdin.readline().strip()
                 command = line.split()
                 if (command[0] == 'MOVE'):
                     print("client: MOVE")
