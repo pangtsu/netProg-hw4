@@ -4,11 +4,14 @@ import sys  # For arg parsing
 import socket  # For sockets
 import select
 import json
+import math
 # python3 client.py [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]
 # i.e.,: python3 client.py control 8071 client1 10 5 5
 # [control address] [control port] [SensorID] [SensorRange] [InitalXPosition] [InitialYPosition]
 
 
+# Hey man there's an error in server. SendTHERE also needs to check for base stations
+# I think my code's done. Debugged quite a bit. Kinda hard to test cause of sendThere and stuff
 
 def sendWhere(server_socket, inputs, outputs, IDToSearch):
     # package where message
@@ -21,7 +24,15 @@ def sendWhere(server_socket, inputs, outputs, IDToSearch):
         command = data.split()
         if (command[0] == 'THERE'):
             print("server: " + data)
-            break
+            return data
+
+# Calls recDataMessage. Might cause errors with printing stuff
+def sendData(server_socket, inputs, outputs, ID, r, xPos, yPos, line):
+    data = line.split(' ')
+    assert data[0] == "SENDDATA", "message is not senddata. Message: " + line
+    destID = line[1]
+    s = "DATAMESSAGE " + ID + " nextID " + destID + " 0 0"
+    recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, s)
 
 def updatePosition(server_socket, inputs, outputs, ID, r, xPos, yPos):
      sendmessage = "UPDATEPOSITION"
@@ -40,7 +51,80 @@ def updatePosition(server_socket, inputs, outputs, ID, r, xPos, yPos):
             string_data = data.split(" ", 2)[2]
             reachable = json.loads(string_data)
             print(reachable)
-            break
+            return reachable
+
+
+"""
+Things I haven't done:
+updatePosition: figure out what it returns??
+
+test where
+
+test this in general
+
+"""
+# DATAMESSAGE [OriginID] [NextID] [DestinationID] [HopListLength] [HopList]
+def recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, message):
+    dataMessage = message.split(' ')
+    assert len(dataMessage) == 6, "Incorrect length of message (length is " + str(len(dataMessage)) + ")"
+    assert dataMessage[0] == "DATAMESSAGE", "message is not DATAMESSAGE"
+    originID = dataMessage[1]
+    nextID = dataMessage[2]
+    destID = dataMessage[3]
+    hopListLength = int(dataMessage[4])
+    hopList = dataMessage[5]
+
+    # Check if we're at destination
+    # UNCOMMENT THIS CODE WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWw
+    """
+    if (ID == destID):
+        print("" + ID + ": Message from " + originID + " to " + destID + " succesfully received.")
+        return"""
+
+    # Check reachable nodes
+    reachableNodes = updatePosition(server_socket, inputs, outputs, ID, r, xPos, yPos)
+    numReachable = len(reachableNodes)
+
+    s = sendWhere(server_socket, inputs, outputs, destID)
+    print("Called where: " + str(s))
+    ary = s.split(' ')
+    assert ary[0] == "THERE", "message is not THERE"
+    assert ary[1] == destID, "id is not correct"
+    destX = int(ary[2])
+    destY = int(ary[3])
+    
+    # Find closest node
+    closestID = "-9999"
+    closestDist = math.inf
+    for reachID in reachableNodes:
+        reachX = reachableNodes[reachID]['x']
+        reachY = reachableNodes[reachID]['y']
+        if (not (reachID in hopList)):
+            dist = math.sqrt((destX - reachX) ** 2 + (destY - reachY) ** 2)
+            if (dist < closestDist or (dist == closestDist and reachID < closestID)):
+                closestDist = dist
+                closestID = reachID
+
+    # Print result and send it
+    if (closestID == "-9999" and math.isinf(closestDist)):
+        print("" + ID + ": Message from " + originID + " to " + destID + " could not be delivered.")
+    else:
+        # Package result
+        nextID = closestID
+        # hopList += "," + ID   # control will add nextID to hoplist
+        # hopeListLength += 1
+        if (ID == originID and nextID == destID):
+            print("" + ID + ": Sent a new message directly to " + destID)
+        elif (ID == originID):
+            print("" + ID + ": Sent a new message bound for " + destID)
+        else:
+            print("" + ID + ": Message from " + originID + " to " + destID + " being forwarded through" + nextID)
+            
+        send_string = "DATAMESSAGE " + originID + " " + nextID + " " + destID + " " + str(hopListLength) + " " + str(hopList) # Might have an error: hoplist might need to be updated
+        server_socket.sendall(send_string.encode('utf-8'))
+    return
+
+    
 
 def run_client():
     if len(sys.argv) != 7:
@@ -76,24 +160,27 @@ def run_client():
 
                 if (command[0] == 'SENDDATA'):
                     print("client: SENDDATA")
+                    sendData(server_socket, inputs, outputs, ID, r, xPos, yPos, line)
                     #send_string = "WHERE"
                     #server_socket.sendall(send_string.encode('utf-8'))
 
-                # ~~~~~~~ CJ's testing Code
                 elif (command[0] == 'WHERE'):
                     IDToSearch = command[1]
                     sendWhere(server_socket, inputs, outputs, IDToSearch)
 
-                # ~~~~~~~ end CJ's testing code
-
                 elif (command[0] == 'QUIT'):
                     print("QUIT")
+                # THIS IS JUST FOR DEBUGGING: REMOVE THE FOLLOWING AFTER FINISHED TESTING
+                elif (command[0] == 'DATAMESSAGE'):
+                    print("server: DATAMESSAGE")
+                    recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, line)
             else:
                 message = s.recv(1024).decode("utf-8")
                 if message:
                     command = message.split()
                     if (command[0] == 'DATAMESSAGE'):
                         print("server: DATAMESSAGE")
+                        recDataMessage(server_socket, inputs, outputs, ID, r, xPos, yPos, line)
                 else:
                     #print("Server has closed")
                     #client_socket.close()
@@ -104,4 +191,5 @@ def run_client():
     server_socket.close()
 
 if __name__ == '__main__':
+    #recDataMessage("9001", "DATAMESSAGE 9000 2 9005 4 5")
     run_client()
