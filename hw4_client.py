@@ -126,7 +126,7 @@ def run_client():
     # Create the TCP socket, connect to the server
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # bind takes a 2-tuple, not 2 arguments
-    server_socket.connect(('localhost', int(sys.argv[2])))
+    server_socket.connect((socket.gethostname(), int(sys.argv[2])))
 
 
     inputs = [sys.stdin, server_socket]
