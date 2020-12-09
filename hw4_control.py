@@ -190,7 +190,7 @@ def run_server():
 
     # Set the socket to listen on localhost, on the specified port
     # bind takes a 2-tuple, not 2 arguments
-    listening_socket.bind(('localhost', int(sys.argv[1])))
+    listening_socket.bind((socket.gethostname(), int(sys.argv[1])))
     listening_socket.listen(5)
     inputs = [sys.stdin, listening_socket]
     sockets = [listening_socket]
